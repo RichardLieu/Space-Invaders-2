@@ -11,6 +11,17 @@ public class EnemyController: MonoBehaviour
     public static event EnemyDeath dead;
     public GameObject bullet;
 
+    private AudioSource _audioSource;
+    public AudioClip enemyShoot;
+    public AudioClip enemyDeath;
+
+    private Animator animator;
+    public void Start()
+    {
+        _audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
+    }
+
     //-----------------------------------------------------------------------------
     private void OnTriggerEnter2D(Collider2D bullet)
     {
@@ -18,10 +29,11 @@ public class EnemyController: MonoBehaviour
         {
             return;
         }
+        _audioSource.clip = enemyDeath;
+        _audioSource.Play();
         dead?.Invoke(score);
-        Destroy(bullet.gameObject); // destroy bullet
-        Destroy(gameObject);
-        Debug.Log("Ouch!" + score);
+        Destroy(bullet.gameObject);
+        animator.SetTrigger("Died");
     }
 
     private void Update()
@@ -30,6 +42,8 @@ public class EnemyController: MonoBehaviour
         {
             GameObject MakeBullet = Instantiate(bullet, transform.position, Quaternion.identity);
             Destroy(MakeBullet, 3);
+            _audioSource.clip = enemyShoot;
+            _audioSource.Play();
         }
     }
 }
